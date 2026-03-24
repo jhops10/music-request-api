@@ -2,6 +2,8 @@ package com.jhops10.music_request_api.infrastructure.persistence;
 
 import com.jhops10.music_request_api.domain.model.Order;
 import com.jhops10.music_request_api.domain.ports.outgoing.OrderRepositoryPort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,11 +33,9 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     }
 
     @Override
-    public List<Order> findAll() {
-       return orderRepositoryJpa.findAll()
-               .stream()
-               .map(this::toDomain)
-               .toList();
+    public Page<Order> findAll(Pageable pageable) {
+        return orderRepositoryJpa.findAll(pageable)
+                .map(this::toDomain);
     }
 
     @Override

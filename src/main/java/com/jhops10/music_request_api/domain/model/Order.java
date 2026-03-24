@@ -18,7 +18,10 @@ public class Order {
     private Tone tone;
     private String musicName;
     private String instructions;
+
+    @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
