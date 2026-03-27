@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: music-request-postgres
+    environment:
+      POSTGRES_DB: music_request_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - music-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d music_request_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: music-request-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - music-network
+
+volumes:
+  postgres_data:
+
+networks:
+  music-network:
+    driver: bridge
