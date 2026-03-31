@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public record OrderResponseDTO(
         UUID id,
-        String studentEmail,
+        UUID userId,
         Instrument instrument,
         Tone tone,
         String musicName,

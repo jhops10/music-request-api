@@ -26,8 +26,8 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "student_email", nullable = false)
-    private String studentEmail;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @Enumerated(EnumType.STRING)
     private Instrument instrument;

@@ -18,6 +18,8 @@ public interface OrderServicePort {
 
     Page<Order> findAll(Pageable pageable);
 
+    Page<Order> findByUserId(UUID userId, Pageable pageable);
+
     Order updateStatus(UUID id, OrderStatus newStatus);
 
 }

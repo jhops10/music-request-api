@@ -4,6 +4,8 @@ import com.jhops10.music_request_api.application.dtos.OrderRequestDTO;
 import com.jhops10.music_request_api.application.dtos.OrderResponseDTO;
 import com.jhops10.music_request_api.application.dtos.UpdateOrderStatusRequestDTO;
 import com.jhops10.music_request_api.application.mappers.OrderMapper;
+import com.jhops10.music_request_api.application.services.AuthenticationService;
+import com.jhops10.music_request_api.domain.enums.UserRole;
 import com.jhops10.music_request_api.domain.model.Order;
 import com.jhops10.music_request_api.domain.ports.incoming.OrderServicePort;
 import jakarta.validation.Valid;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -24,16 +27,22 @@ public class OrderController {
 
     private final OrderServicePort orderServicePort;
     private final OrderMapper orderMapper;
+    private final AuthenticationService authenticationService;
 
-    public OrderController(OrderServicePort orderServicePort, OrderMapper orderMapper) {
+    public OrderController(OrderServicePort orderServicePort, OrderMapper orderMapper, AuthenticationService authenticationService) {
         this.orderServicePort = orderServicePort;
         this.orderMapper = orderMapper;
+        this.authenticationService = authenticationService;
     }
 
 
     @PostMapping
-    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody @Valid OrderRequestDTO request) {
-        Order order = orderMapper.toDomain(request);
+    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody @Valid OrderRequestDTO request,
+                                                        Authentication authentication) {
+
+        UUID userId = authenticationService.getUserId(authentication);
+
+        Order order = orderMapper.toDomain(request, userId);
         Order created = orderServicePort.createOrder(order);
         OrderResponseDTO response = orderMapper.toResponse(created);
 
@@ -48,12 +57,21 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<Page<OrderResponseDTO>> getAllOrders(
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable) {
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            Authentication authentication) {
 
-        Page<Order> ordersPage = orderServicePort.findAll(pageable);
+        UUID userId = authenticationService.getUserId(authentication);
+        UserRole role = authenticationService.getUserRole(authentication);
+
+        Page<Order> ordersPage;
+
+        if (role == UserRole.STUDENT) {
+            ordersPage = orderServicePort.findByUserId(userId, pageable);
+        } else {
+            ordersPage = orderServicePort.findAll(pageable);
+        }
+
         Page<OrderResponseDTO> response = ordersPage.map(orderMapper::toResponse);
-
         return ResponseEntity.ok(response);
     }
 
