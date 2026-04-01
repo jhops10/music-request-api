@@ -76,17 +76,27 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable("id") UUID id) {
+    public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable("id") UUID id,
+                                                         Authentication authentication) {
+
+        UUID userId = authenticationService.getUserId(authentication);
+        UserRole role = authenticationService.getUserRole(authentication);
+
         Order order = orderServicePort.findByIdOrThrow(id);
 
-        OrderResponseDTO response = orderMapper.toResponse(order);
 
+        if (role == UserRole.STUDENT && !order.getUserId().equals(userId)) {
+            throw new RuntimeException("You can only view your own orders");
+        }
+
+        OrderResponseDTO response = orderMapper.toResponse(order);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable("id") UUID id,
-                                                              @RequestBody @Valid UpdateOrderStatusRequestDTO request) {
+                                                              @RequestBody @Valid UpdateOrderStatusRequestDTO request,
+                                                              Authentication authentication) {
 
         Order updated = orderServicePort.updateStatus(id, request.status());
         OrderResponseDTO response = orderMapper.toResponse(updated);
