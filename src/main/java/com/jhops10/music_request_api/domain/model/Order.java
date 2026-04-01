@@ -13,7 +13,7 @@ import java.util.UUID;
 public class Order {
 
     private UUID id;
-    private String studentEmail;
+    private UUID userId;
     private Instrument instrument;
     private Tone tone;
     private String musicName;

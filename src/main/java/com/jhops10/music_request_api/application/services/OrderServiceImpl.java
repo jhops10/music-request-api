@@ -52,4 +52,9 @@ public class OrderServiceImpl implements OrderServicePort {
        order.updateStatus(newStatus);
         return orderRepositoryPort.save(order);
     }
+
+    @Override
+    public Page<Order> findByUserId(UUID userId, Pageable pageable) {
+        return orderRepositoryPort.findByUserId(userId, pageable);
+    }
 }

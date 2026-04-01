@@ -39,6 +39,12 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     }
 
     @Override
+    public Page<Order> findByUserId(UUID userId, Pageable pageable) {
+        return orderRepositoryJpa.findByUserId(userId, pageable)
+                .map(this::toDomain);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         orderRepositoryJpa.deleteById(id);
     }
@@ -51,7 +57,7 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     private OrderEntity toEntity(Order order) {
         return OrderEntity.builder()
                 .id(order.getId())
-                .studentEmail(order.getStudentEmail())
+                .userId(order.getUserId())
                 .instrument(order.getInstrument())
                 .tone(order.getTone())
                 .musicName(order.getMusicName())
@@ -65,7 +71,7 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     private Order toDomain(OrderEntity orderEntity) {
         return Order.builder()
                 .id(orderEntity.getId())
-                .studentEmail(orderEntity.getStudentEmail())
+                .userId(orderEntity.getUserId())
                 .instrument(orderEntity.getInstrument())
                 .tone(orderEntity.getTone())
                 .musicName(orderEntity.getMusicName())

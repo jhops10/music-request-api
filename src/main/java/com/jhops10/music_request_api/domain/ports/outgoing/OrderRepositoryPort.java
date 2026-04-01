@@ -15,6 +15,8 @@ public interface OrderRepositoryPort {
 
     Page<Order> findAll(Pageable pageable);
 
+    Page<Order> findByUserId(UUID userId, Pageable pageable);
+
     void deleteById(UUID id);
 
     boolean existsById(UUID id);

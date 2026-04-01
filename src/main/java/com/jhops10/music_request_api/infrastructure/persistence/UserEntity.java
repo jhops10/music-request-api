@@ -1,8 +1,6 @@
 package com.jhops10.music_request_api.infrastructure.persistence;
 
-import com.jhops10.music_request_api.domain.enums.Instrument;
-import com.jhops10.music_request_api.domain.enums.OrderStatus;
-import com.jhops10.music_request_api.domain.enums.Tone;
+import com.jhops10.music_request_api.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,35 +13,25 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_orders")
+@Table(name = "tb_users")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    private Instrument instrument;
-
-    @Enumerated(EnumType.STRING)
-    private Tone tone;
-
-    @Column(name = "music_name", nullable = false)
-    private String musicName;
-
-    @Column(columnDefinition = "TEXT")
-    private String instructions;
-
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private OrderStatus status = OrderStatus.PENDING;
+    private UserRole role;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -52,4 +40,5 @@ public class OrderEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
 }

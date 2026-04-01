@@ -5,12 +5,14 @@ import com.jhops10.music_request_api.application.dtos.OrderResponseDTO;
 import com.jhops10.music_request_api.domain.model.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class OrderMapper {
 
-    public Order toDomain(OrderRequestDTO request) {
+    public Order toDomain(OrderRequestDTO request, UUID userId) {
         return Order.builder()
-                .studentEmail(request.studentEmail())
+                .userId(userId)
                 .instrument(request.instrument())
                 .tone(request.tone())
                 .musicName(request.musicName())
@@ -21,7 +23,7 @@ public class OrderMapper {
     public OrderResponseDTO toResponse(Order order) {
         return new OrderResponseDTO(
                 order.getId(),
-                order.getStudentEmail(),
+                order.getUserId(),
                 order.getInstrument(),
                 order.getTone(),
                 order.getMusicName(),
