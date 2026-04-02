@@ -6,6 +6,7 @@ import com.jhops10.music_request_api.application.dtos.UpdateOrderStatusRequestDT
 import com.jhops10.music_request_api.application.mappers.OrderMapper;
 import com.jhops10.music_request_api.application.services.AuthenticationService;
 import com.jhops10.music_request_api.domain.enums.UserRole;
+import com.jhops10.music_request_api.domain.exceptions.UnauthorizedAccessException;
 import com.jhops10.music_request_api.domain.model.Order;
 import com.jhops10.music_request_api.domain.ports.incoming.OrderServicePort;
 import jakarta.validation.Valid;
@@ -86,7 +87,7 @@ public class OrderController {
 
 
         if (role == UserRole.STUDENT && !order.getUserId().equals(userId)) {
-            throw new RuntimeException("You can only view your own orders");
+            throw new UnauthorizedAccessException("Student cannot view order belonging to another user. Order ID: " + id);
         }
 
         OrderResponseDTO response = orderMapper.toResponse(order);
@@ -97,6 +98,12 @@ public class OrderController {
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable("id") UUID id,
                                                               @RequestBody @Valid UpdateOrderStatusRequestDTO request,
                                                               Authentication authentication) {
+
+        UserRole role = authenticationService.getUserRole(authentication);
+
+        if (role != UserRole.TEACHER) {
+            throw new UnauthorizedAccessException("User with role " + role + " cannot update order status. Only TEACHER can.");
+        }
 
         Order updated = orderServicePort.updateStatus(id, request.status());
         OrderResponseDTO response = orderMapper.toResponse(updated);
