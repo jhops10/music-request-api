@@ -3,6 +3,8 @@ package com.jhops10.music_request_api.application.controllers;
 import com.jhops10.music_request_api.application.dtos.AuthResponseDTO;
 import com.jhops10.music_request_api.application.dtos.LoginRequestDTO;
 import com.jhops10.music_request_api.application.dtos.RegisterRequestDTO;
+import com.jhops10.music_request_api.domain.exceptions.InvalidCredentialsException;
+import com.jhops10.music_request_api.domain.exceptions.UserAlreadyExistsException;
 import com.jhops10.music_request_api.domain.model.User;
 import com.jhops10.music_request_api.domain.ports.outgoing.UserRepositoryPort;
 import com.jhops10.music_request_api.infrastructure.security.JwtService;
@@ -10,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,12 +45,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
 
-        // 1. Verificar se email já existe
         if (userRepositoryPort.existsByEmail(request.email())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new UserAlreadyExistsException("User already exists with email: " + request.email());
         }
 
-        // 2. Criar usuário
         User user = User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))  // Codifica senha
@@ -56,13 +57,10 @@ public class AuthController {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        // 3. Salvar
         User savedUser = userRepositoryPort.save(user);
 
-        // 4. Gerar token JWT
         String token = jwtService.generateToken(savedUser);
 
-        // 5. Retornar resposta
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AuthResponseDTO(token, "Bearer", savedUser.getEmail(), savedUser.getRole()));
     }
@@ -70,19 +68,20 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
 
-        // 1. Autenticar usuário
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
 
-        // 2. Buscar usuário autenticado
-        User user = userRepositoryPort.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            User user = userRepositoryPort.findByEmail(request.email())
+                    .orElseThrow(() -> new InvalidCredentialsException("User not found with email: " + request.email()));
 
-        // 3. Gerar token JWT
-        String token = jwtService.generateToken(user);
+            String token = jwtService.generateToken(user);
 
-        // 4. Retornar resposta
-        return ResponseEntity.ok(new AuthResponseDTO(token, "Bearer", user.getEmail(), user.getRole()));
+            return ResponseEntity.ok(new AuthResponseDTO(token, "Bearer", user.getEmail(), user.getRole()));
+
+        } catch (BadCredentialsException e) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
     }
 }
