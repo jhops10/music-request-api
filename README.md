@@ -155,8 +155,8 @@ docker-compose up -d --build   # Sobe PostgreSQL + Aplicação
 | Fase                         | Status        |
 |------------------------------|---------------|
 | Core + Autenticação JWT      | ✅ Concluído  |
-| Testes Unitários/Integração  | 🚧 Em andamento |
-| Mensageria (RabbitMQ)        | ⏳ Pendente   |
+| Testes Unitários/Integração  | ✅ Concluído |
+| Mensageria (RabbitMQ)        | 🚧 Em andamento   |
 | Cache (Redis)                | ⏳ Pendente   |
 | Deploy em Cloud (AWS)        | ⏳ Pendente   |
 
