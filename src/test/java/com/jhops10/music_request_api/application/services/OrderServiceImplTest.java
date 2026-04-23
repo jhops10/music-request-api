@@ -6,6 +6,7 @@ import com.jhops10.music_request_api.domain.enums.Tone;
 import com.jhops10.music_request_api.domain.exceptions.OrderNotFoundException;
 import com.jhops10.music_request_api.domain.model.Order;
 import com.jhops10.music_request_api.domain.ports.outgoing.OrderRepositoryPort;
+import com.jhops10.music_request_api.infrastructure.messaging.OrderEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ class OrderServiceImplTest {
 
     @Mock
     private OrderRepositoryPort orderRepositoryPort;
+
+    @Mock
+    private OrderEventPublisher eventPublisher;
 
     @InjectMocks
     private OrderServiceImpl orderService;
