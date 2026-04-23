@@ -5,6 +5,7 @@ import com.jhops10.music_request_api.domain.exceptions.OrderNotFoundException;
 import com.jhops10.music_request_api.domain.model.Order;
 import com.jhops10.music_request_api.domain.ports.incoming.OrderServicePort;
 import com.jhops10.music_request_api.domain.ports.outgoing.OrderRepositoryPort;
+import com.jhops10.music_request_api.infrastructure.messaging.OrderEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,20 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderServicePort {
 
     private final OrderRepositoryPort orderRepositoryPort;
+    private final OrderEventPublisher eventPublisher;
 
-    public OrderServiceImpl(OrderRepositoryPort orderRepositoryPort) {
+    public OrderServiceImpl(OrderRepositoryPort orderRepositoryPort, OrderEventPublisher eventPublisher) {
         this.orderRepositoryPort = orderRepositoryPort;
+        this.eventPublisher = eventPublisher;
     }
 
 
     @Override
     public Order createOrder(Order order) {
-        return orderRepositoryPort.save(order);
+        Order savedOrder = orderRepositoryPort.save(order);
+
+        eventPublisher.publishOrderCreatedEvent(savedOrder);
+        return savedOrder;
     }
 
     @Override

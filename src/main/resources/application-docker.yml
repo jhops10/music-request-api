@@ -17,5 +17,12 @@ spring:
           lob:
             non_contextual_creation: true
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin123
+    connection-timeout: 5000
+
 server:
   port: 8080

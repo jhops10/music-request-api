@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev  #dev para h2 e docker para postgreSQL
+    active: docker  #dev para h2 e docker para postgreSQL
   jackson:
     deserialization:
       fail-on-unknown-properties: false
