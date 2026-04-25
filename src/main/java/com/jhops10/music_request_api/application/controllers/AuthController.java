@@ -8,6 +8,12 @@ import com.jhops10.music_request_api.domain.exceptions.UserAlreadyExistsExceptio
 import com.jhops10.music_request_api.domain.model.User;
 import com.jhops10.music_request_api.domain.ports.outgoing.UserRepositoryPort;
 import com.jhops10.music_request_api.infrastructure.security.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +31,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Autenticação", description = "Endpoints para registro e login de usuários")
 public class AuthController {
 
     private final UserRepositoryPort userRepositoryPort;
@@ -43,6 +50,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar novo usuário", description = "Cria uma nova conta de usuário com role STUDENT ou TEACHER")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso.",
+                    content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Email já cadastrado")
+    })
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
 
         if (userRepositoryPort.existsByEmail(request.email())) {
@@ -66,6 +80,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login de usuário", description = "Autentica o usuário e retorna um token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login com sucesso",
+                    content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
 
         try {

@@ -9,6 +9,11 @@ import com.jhops10.music_request_api.domain.enums.UserRole;
 import com.jhops10.music_request_api.domain.exceptions.UnauthorizedAccessException;
 import com.jhops10.music_request_api.domain.model.Order;
 import com.jhops10.music_request_api.domain.ports.incoming.OrderServicePort;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +29,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/orders")
+@Tag(name = "Pedidos", description = "Endpoints para gerenciar pedidos de músicas")
+@SecurityRequirement(name = "Bearer Authentication")
 public class OrderController {
 
     private final OrderServicePort orderServicePort;
@@ -38,6 +45,12 @@ public class OrderController {
 
 
     @PostMapping
+    @Operation(summary = "Criar pedido", description = "Cria um novo pedido de música para o usuário autenticado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Pedido criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado")
+    })
     public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody @Valid OrderRequestDTO request,
                                                         Authentication authentication) {
 
@@ -57,6 +70,11 @@ public class OrderController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar pedidos", description = "Retorna pedidos paginados. STUDENT vê apenas seus pedidos, TEACHER vê todos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado")
+    })
     public ResponseEntity<Page<OrderResponseDTO>> getAllOrders(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication authentication) {
@@ -77,6 +95,12 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedido encontrado"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado (STUDENT vendo pedido de outro)")
+    })
     public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable("id") UUID id,
                                                          Authentication authentication) {
 
@@ -95,6 +119,12 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/status")
+    @Operation(summary = "Atualizar status do pedido", description = "Apenas TEACHER pode atualizar status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status atualizado"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado (apenas TEACHER)")
+    })
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable("id") UUID id,
                                                               @RequestBody @Valid UpdateOrderStatusRequestDTO request,
                                                               Authentication authentication) {
