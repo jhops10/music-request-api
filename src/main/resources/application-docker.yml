@@ -24,5 +24,16 @@ spring:
     password: admin123
     connection-timeout: 5000
 
+  springdoc:
+    api-docs:
+      path: /api-docs
+    swagger-ui:
+      path: /swagger-ui.html
+      operationsSorter: method
+      tagsSorter: alpha
+      tryItOutEnabled: true
+      filter: true
+    show-actuator: true
+
 server:
   port: 8080

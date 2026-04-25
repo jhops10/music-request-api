@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev  #dev para h2 e docker para postgreSQL
+    active: docker  #dev para h2 e docker para postgreSQL
   jackson:
     deserialization:
       fail-on-unknown-properties: false
@@ -14,3 +14,14 @@ logging:
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
   expiration: 86400000  # 24 horas
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    filter: true
+  show-actuator: true

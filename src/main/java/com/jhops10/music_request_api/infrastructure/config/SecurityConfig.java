@@ -42,6 +42,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/orders").hasAnyRole("STUDENT", "TEACHER")
                         .requestMatchers("/api/v1/orders/**").hasAnyRole("STUDENT", "TEACHER")
                         .requestMatchers("/api/v1/orders/*/status").hasRole("TEACHER")
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
