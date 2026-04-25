@@ -79,7 +79,6 @@ A API possui documentação interativa gerada com OpenAPI 3.0 (Swagger).
 
 ### Acesso
 - **Swagger UI:** http://localhost:8080/swagger-ui.html
-- **OpenAPI JSON:** http://localhost:8080/v3/api-docs
 
 ### Como usar a documentação
 1. Acesse o Swagger UI
