@@ -1,7 +1,7 @@
 # 🎵 Music Request API
 
 [![Java](https://img.shields.io/badge/Java-17-blue)](https://www.java.com/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green)](https://spring.io/projects/spring-boot)
 [![JWT](https://img.shields.io/badge/JWT-Authentication-orange)](https://jwt.io/)
 [![Docker](https://img.shields.io/badge/Docker-Container-blue)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)](https://www.postgresql.org/)
